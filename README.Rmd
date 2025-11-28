@@ -1,9 +1,22 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
 # tense
 
-``` r
+
+```{r}
 library(tense)
 library(ggplot2)
 
@@ -11,11 +24,11 @@ t <- seq(0, 20, by = 0.5)
 y <- sin(t) * 10
 train <- y[1:(length(y) - 10)]
 test <- y[(length(y) - 9):length(y)]
+
 ```
 
 initialize, fit, and predict with an llm:
-
-``` r
+```{r}
 
 # spec:
 model_spec <- tense_init(
@@ -29,32 +42,26 @@ model <- tense_fit(model_spec, train)
 
 # predict
 forecast <- tense_predict(model, h = 10)
-#> Asking LLM to feel the data...
-#> Predicted Moods: steady, unsatisfactory, bad, painful, painful, bad
+
 ```
 
-comparison of data and lexicon:
-
-``` r
+comparison of data and lexicon: 
+```{r}
 last_seen_data <- tail(model$history, 5)
 last_seen_words <- tense:::encode_sentiment(last_seen_data, model$lexicon)
 
 cat("\n--- The Model's Inner Monologue ---\n")
-#> 
-#> --- The Model's Inner Monologue ---
 cat("Last 5 Inputs: ", paste(last_seen_words, collapse = " -> "), "\n")
-#> Last 5 Inputs:  satisfactory -> solid -> excellent -> great -> positive
 cat(
   "Numerical Value:",
   paste(round(tail(train, 5), 2), collapse = " -> "),
   "\n"
 )
-#> Numerical Value: 4.2 -> 8.04 -> 9.91 -> 9.35 -> 6.5
+
 ```
 
 compare the predictions:
-
-``` r
+```{r}
 df_plot <- rbind(
   data.frame(Time = 1:length(train), Value = train, Type = "History"),
   data.frame(
@@ -81,13 +88,13 @@ ggplot(df_plot, aes(x = Time, y = Value, color = Type)) +
     subtitle = "semantic TimeLLM forecast: gpt-oss:20b, t=0.90, window=30",
     y = "Signal Value"
   )
+
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+
 
 initialize, fit, and predict with an llm:
-
-``` r
+```{r}
 
 # spec:
 model_spec <- tense_init(
@@ -101,32 +108,26 @@ model <- tense_fit(model_spec, train)
 
 # predict
 forecast <- tense_predict(model, h = 10)
-#> Asking LLM to feel the data...
-#> Predicted Moods: great, excellent, solid, satisfactory, mediocre, lacking
+
 ```
 
-comparison of data and lexicon:
-
-``` r
+comparison of data and lexicon: 
+```{r}
 last_seen_data <- tail(model$history, 5)
 last_seen_words <- tense:::encode_sentiment(last_seen_data, model$lexicon)
 
 cat("\n--- The Model's Inner Monologue ---\n")
-#> 
-#> --- The Model's Inner Monologue ---
 cat("Last 5 Inputs: ", paste(last_seen_words, collapse = " -> "), "\n")
-#> Last 5 Inputs:  satisfactory -> solid -> excellent -> great -> positive
 cat(
   "Numerical Value:",
   paste(round(tail(train, 5), 2), collapse = " -> "),
   "\n"
 )
-#> Numerical Value: 4.2 -> 8.04 -> 9.91 -> 9.35 -> 6.5
+
 ```
 
 compare the predictions:
-
-``` r
+```{r}
 df_plot <- rbind(
   data.frame(Time = 1:length(train), Value = train, Type = "History"),
   data.frame(
@@ -153,6 +154,5 @@ ggplot(df_plot, aes(x = Time, y = Value, color = Type)) +
     subtitle = "semantic TimeLLM forecast: gpt-oss:20b, t=0.20, window=20",
     y = "Signal Value"
   )
-```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+```
