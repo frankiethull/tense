@@ -6,6 +6,8 @@
 \alias{tense-package}
 \title{tense: TENSE: a time-llm model}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 tense is an text-based time-LLM semantic expression implementation. Using LLMs to predict the next token, tense is time-based estimation via semantic sentiment encoding & quantization for LLMs.
 }
 \author{
