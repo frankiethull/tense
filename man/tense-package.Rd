@@ -4,11 +4,11 @@
 \name{tense-package}
 \alias{tense}
 \alias{tense-package}
-\title{tense: TENSE: a time-llm model}
+\title{tense: tense is a LLM semantic sequence simulation technique for ordered numbers}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-tense is an text-based time-LLM semantic expression implementation. Using LLMs to predict the next token, tense is time-based estimation via semantic sentiment encoding & quantization for LLMs.
+tense is an text-based LLM semantic expression implementation for ordered numeric sequences. Using LLMs to predict the next token, tense is time-based estimation via semantic sentiment encoding & quantization for LLMs.
 }
 \author{
 \strong{Maintainer}: frank hull \email{frankiethull@proton.me}
