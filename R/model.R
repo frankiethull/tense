@@ -2,18 +2,37 @@
 #'
 #' @param model_name LLM model name.
 #' @param temperature a temperature for the LLM
+#' @param seed Sets the random number seed to use for generation.
+#' Setting this to a specific number will make the model generate the same text for the same prompt.
+#' @param top_k Reduces the probability of generating nonsense.
+#' A higher value (e.g. 100) will give more diverse answers,
+#' while a lower value (e.g. 10) will be more conservative
+#' @param top_p Works together with top-k. A higher value (e.g., 0.95)
+#' will lead to more diverse text,
+#' while a lower value (e.g., 0.5) will generate more focused and conservative text.
+#' @param ... additional LLM parameter controls
 #' @param context_window Steps to look back.
 #' @export
 tense_init <- function(
   model_name = "llama3",
   temperature = 0.9,
-  context_window = 40
+  seed = 17,
+  top_k = 10,
+  top_p = 0.5,
+  context_window = 40,
+  ...
 ) {
   chat_client <- tryCatch(
     {
       ellmer::chat_ollama(
         model = model_name,
-        params = list(temperature = temperature)
+        params = list(
+          temperature = temperature,
+          seed = seed,
+          top_k = top_k,
+          top_p = top_p,
+          ... = ...
+        )
       )
     },
     error = function(e) stop("Ollama connection failed.")

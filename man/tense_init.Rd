@@ -4,14 +4,35 @@
 \alias{tense_init}
 \title{Initialize Tense Model}
 \usage{
-tense_init(model_name = "llama3", temperature = 0.9, context_window = 40)
+tense_init(
+  model_name = "llama3",
+  temperature = 0.9,
+  seed = 17,
+  top_k = 10,
+  top_p = 0.5,
+  context_window = 40,
+  ...
+)
 }
 \arguments{
 \item{model_name}{LLM model name.}
 
 \item{temperature}{a temperature for the LLM}
 
+\item{seed}{Sets the random number seed to use for generation.
+Setting this to a specific number will make the model generate the same text for the same prompt.}
+
+\item{top_k}{Reduces the probability of generating nonsense.
+A higher value (e.g. 100) will give more diverse answers,
+while a lower value (e.g. 10) will be more conservative}
+
+\item{top_p}{Works together with top-k. A higher value (e.g., 0.95)
+will lead to more diverse text,
+while a lower value (e.g., 0.5) will generate more focused and conservative text.}
+
 \item{context_window}{Steps to look back.}
+
+\item{...}{additional LLM parameter controls}
 }
 \description{
 Initialize Tense Model
