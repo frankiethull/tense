@@ -14,7 +14,7 @@
 #' @param context_window Steps to look back.
 #' @export
 tense_init <- function(
-  model_name = "llama3",
+  model_name = "ollama/gemma3:12b",
   temperature = 0.9,
   seed = 17,
   top_k = 10,
@@ -35,7 +35,7 @@ tense_init <- function(
         )
       )
     },
-    error = function(e) stop("Ollama connection failed.")
+    error = function(e) stop("chat client connection failed.")
   )
 
   structure(

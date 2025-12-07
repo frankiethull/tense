@@ -5,7 +5,7 @@
 \title{Initialize Tense Model}
 \usage{
 tense_init(
-  model_name = "llama3",
+  model_name = "ollama/gemma3:12b",
   temperature = 0.9,
   seed = 17,
   top_k = 10,
