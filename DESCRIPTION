@@ -1,6 +1,6 @@
 Package: tense
 Title: tense is a LLM semantic sequence simulation technique for ordered numbers
-Version: 0.0.0.9000
+Version: 0.0.1.9000
 Authors@R: 
     person("frank", "hull", , "frankiethull@proton.me", role = c("aut", "cre"))
 Description: tense is an text-based LLM semantic expression implementation for ordered numeric sequences. Using LLMs to predict the next token, tense is time-based estimation via semantic sentiment encoding & quantization for LLMs. 

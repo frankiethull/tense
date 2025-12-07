@@ -15,7 +15,7 @@ tense_init(
 )
 }
 \arguments{
-\item{model_name}{LLM model name.}
+\item{model_name}{LLM model name for \code{ellmer::chat()} API interface}
 
 \item{temperature}{a temperature for the LLM}
 

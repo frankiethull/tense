@@ -1,6 +1,6 @@
 #' Initialize Tense Model
 #'
-#' @param model_name LLM model name.
+#' @param model_name LLM model name for `ellmer::chat()` API interface
 #' @param temperature a temperature for the LLM
 #' @param seed Sets the random number seed to use for generation.
 #' Setting this to a specific number will make the model generate the same text for the same prompt.
@@ -24,8 +24,8 @@ tense_init <- function(
 ) {
   chat_client <- tryCatch(
     {
-      ellmer::chat_ollama(
-        model = model_name,
+      ellmer::chat(
+        name = model_name,
         params = list(
           temperature = temperature,
           seed = seed,
