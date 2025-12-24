@@ -2,8 +2,10 @@
 #'
 #' @param model Fitted tense object.
 #' @param h Horizon.
+#' @param share_lexicon whether or not to share the lexicon encoding with the LLM. (
+#' defaults to FALSE to shorten context length.)
 #' @export
-tense_predict <- function(model, h = 10) {
+tense_predict <- function(model, h = 10, share_lexicon = FALSE) {
   # 1. Get Context
   n <- length(model$history)
   win <- min(model$context_window, n)
@@ -13,6 +15,16 @@ tense_predict <- function(model, h = 10) {
   input_words <- encode_sentiment(input_data, model$lexicon)
   input_str <- paste(input_words, collapse = ", ")
 
+  lexicon_str <- get_lexicon() |> toString()
+
+  rule_one <- "1. You must strictly use words from standard English intensity (e.g., bad, neutral, good, great)."
+
+  if (share_lexicon) {
+    rule_one <- glue::glue(
+      "1. You must strictly use words from this lexicon dictionary: {lexicon_str}"
+    )
+  }
+
   # 3. Prompt
   prompt <- glue::glue(
     "
@@ -20,12 +32,12 @@ I have a log of emotional intensity tracked over time. The feeling moves up and 
 Current Stream: {input_str}
 Task: Predict the next {h} emotional states in this narrative.
 
-Rules:
-1. You must strictly use words from standard English intensity (e.g., bad, neutral, good, great).
+Rules:   
+{rule_one}   
 2. Follow the momentum of the stream.
 3. Return EXACTLY {h} words separated by commas.
 4. Output nothing else.
-"
+  "
   )
 
   # 4. LLM Generation

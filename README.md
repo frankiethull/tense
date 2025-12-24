@@ -24,21 +24,25 @@ length.
 ``` mermaid
 flowchart LR
   A[univariate numeric vector] --> B[lexicon encoded tokens]
-  B --> C{LLM determines token pattern}
+  B --> C{LLM finds token pattern}
   C --> D[predict next lexical token]
   D --> E[decode tokens into numeric vector]
 ```
 
 ## a tense example
 
+``` r
+library(tense)
+library(ggplot2)
+```
+
 comparison of different models, temperatures, and context windows.
 **Note that results will change every time the code is executed, even
 with seeds set LLM results can vary.**
 
-``` r
-library(tense)
-library(ggplot2)
+## sine wave:
 
+``` r
 t <- seq(0, 60, by = 0.5)
 y <- sin(t) * 10
 train <- y[1:(length(y) - 30)]
@@ -47,79 +51,101 @@ test <- y[(length(y) - 29):length(y)]
 h <- length(test)
 ```
 
+### LLM fit & infer
+
+model
+
 ``` r
-
-model_names <- c(
-  "gpt-oss:20b",
-  "hermes3",
-  "gemma3:12b",
-  "smollm2",
-  "deepseek-r1:7b"
-)
-context_windows <- c(30, 45, 25, 60, 90)
-temperatures <- c(0.10, 0.45, 1.00, 0.20, 0.31)
-
-df_plot <- rbind(
-  data.frame(
-    Time = 1:length(train),
-    Value = train,
-    Model = "History"
-  ),
-  data.frame(
-    Time = (length(train) + 1):(length(train) + h),
-    Value = test,
-    Model = "Actual"
-  )
+spec <- tense_init(
+  model_name = "ollama/gemma3:4b",
+  temperature = 0.85,
+  seed = 14,
+  top_k = 30,
+  top_p = 0.75,
+  context_window = length(train)
 )
 
-# loop: init, fit, predict, bind
-for (i in seq_along(model_names)) {
-  spec <- tense_init(
-    model_name = model_names[i],
-    context_window = context_windows[i],
-    temperature = temperatures[i]
-  )
-
-  model_i <- tense_fit(spec, train)
-  fc_i <- tense_predict(model_i, h = h)
-
-  df_fc_i <- data.frame(
-    Time = (length(train) + 1):(length(train) + h),
-    Value = fc_i,
-    Model = model_names[i]
-  )
-
-  df_plot <- rbind(df_plot, df_fc_i)
-}
+fit <- tense_fit(spec, train)
+pred <- tense_predict(fit, h = h)
 #> LLM Learning & Inferring ...
-#> Predicted Lexicon: wonderful, excellent, positive, steady, weak, bad
-#> LLM Learning & Inferring ...
-#> Waiting 2s for retry backoff ■■■■■■■■■■■■■■■                                                                               Waiting 3s for retry backoff ■■■■■■■■■■■■                    Waiting 3s for retry backoff ■■■■■■■■■■■■■■                  Waiting 3s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■       Waiting 3s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■     Waiting 3s for retry backoff ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                                 Predicted Lexicon: bad, depressing, unfortunate, lacking, mediocre, decent
-#> LLM Learning & Inferring ... 
-#> Predicted Lexicon: steady, positive, excellent, superb, superb, solid
-#> LLM Learning & Inferring ... 
-#> Predicted Lexicon: acceptable, shaky, poor, unfortunate, depressing, negative
-#> LLM Learning & Inferring ... 
-#> Predicted Lexicon: <think>
-#> Alright, so Ive got this query where someone is asking me to predict the next 30 emotional states based on a given stream of emotions Lets break it down
-#> 
-#> First, they provided a log of emotional intensity over time, with feelings going up and down The current stream has a lot of positive words like promising, excellent, wonderful that are repeated multiple times Then theres a dip into negatives like negative
-#> Warning in decode_sentiment(pred_words, model$lexicon): LLM used words outside
-#> the lexicon. Imputing with 'neutral'.
+#> Predicted Lexicon: great, amazing, perfect, incredible, superb, acceptable
 
-# plot: solid lines + points, color = model only
-ggplot(df_plot, aes(x = Time, y = Value, color = Model)) +
-  geom_line() +
-  theme_minimal(base_size = 12) +
-  scale_color_viridis_d(option = "turbo") +
-  labs(
-    title = "tense forecasts by model",
-    y = "Signal Value",
-    color = "Series"
+pred_df <- data.frame(
+  pred = pred
+) |>
+  dplyr::mutate(t = dplyr::row_number() + length(train))
+```
+
+comparison:
+
+``` r
+data.frame(
+  obs = y
+) |>
+  dplyr::mutate(
+    t = dplyr::row_number(),
+    type = ifelse(t > length(train), "test", "train")
+  ) |>
+  ggplot() +
+  geom_line(aes(x = t, y = obs, color = type)) +
+  geom_line(
+    inherit.aes = FALSE,
+    data = pred_df,
+    aes(x = t, y = pred, color = "LLM")
   )
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
-*tense was originally written by Gemini then debugged with Sonar.
-Packaged via Gemini, Claude Opus, & then documented with Sonar.*
+## sun spot time series:
+
+``` r
+# Load sunspot data (yearly sunspot numbers 1700-1988)
+data <- as.numeric(sunspot.year)
+n <- length(data) # 289 observations
+
+train <- data[1:250] # First 250 years for training
+test <- data[251:289] # Last 39 years for testing
+h <- length(test)
+```
+
+### LLM fit & infer
+
+``` r
+spec <- tense_init(
+  model_name = "google_gemini/gemini-2.5-flash-lite",
+  # model_name = "mistral/mistral-medium",
+  temperature = 0.1,
+  seed = 5,
+  top_k = 50,
+  top_p = 0.5,
+  context_window = length(train)
+)
+
+fit <- tense_fit(spec, sqrt(train))
+pred <- tense_predict(fit, h = h, share_lexicon = TRUE)
+#> LLM Learning & Inferring ...
+#> Predicted Lexicon: divine, incredible, excellent, satisfactory, uncertain, bad
+
+pred_df <- data.frame(
+  pred = pred
+) |>
+  dplyr::mutate(t = dplyr::row_number() + length(train))
+
+data.frame(
+  obs = data
+) |>
+  dplyr::mutate(
+    t = dplyr::row_number(),
+    type = ifelse(t > length(train), "test", "train")
+  ) |>
+  ggplot() +
+  geom_line(aes(x = t, y = obs, color = type)) +
+  geom_line(
+    inherit.aes = FALSE,
+    data = pred_df,
+    aes(x = t, y = pred^2, color = "LLM")
+  )
+```
+
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />

@@ -4,12 +4,15 @@
 \alias{tense_predict}
 \title{Forecast}
 \usage{
-tense_predict(model, h = 10)
+tense_predict(model, h = 10, share_lexicon = FALSE)
 }
 \arguments{
 \item{model}{Fitted tense object.}
 
 \item{h}{Horizon.}
+
+\item{share_lexicon}{whether or not to share the lexicon encoding with the LLM. (
+defaults to FALSE to shorten context length.)}
 }
 \description{
 Forecast
